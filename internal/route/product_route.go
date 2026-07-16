@@ -10,7 +10,7 @@ func registerProductRoutes(
 	api *gin.RouterGroup,
 	productHandler *handler.ProductHandler,
 ) {
-	products := api.Group("/products")
+	products := api.Group("/product")
 
 	products.POST("", productHandler.Create)
 	products.GET("", productHandler.FindAll)

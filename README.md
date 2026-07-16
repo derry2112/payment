@@ -91,11 +91,17 @@ Client -> Route -> Handler -> Service -> Repository -> PostgreSQL
 | Method | Endpoint | Keterangan |
 |---|---|---|
 | `GET` | `/health` | Health check |
-| `POST` | `/api/v1/products` | Membuat produk |
-| `GET` | `/api/v1/products?page=1&limit=10` | Daftar produk |
-| `GET` | `/api/v1/products/:id` | Detail produk |
-| `PATCH` | `/api/v1/products/:id` | Memperbarui produk |
-| `DELETE` | `/api/v1/products/:id` | Menghapus produk |
+| `POST` | `/api/product` | Membuat produk |
+| `GET` | `/api/product?page=1&limit=10` | Daftar produk |
+| `GET` | `/api/product/:id` | Detail produk |
+| `PATCH` | `/api/product/:id` | Memperbarui produk |
+| `DELETE` | `/api/product/:id` | Menghapus produk |
+| `POST` | `/api/category` | Membuat kategori |
+| `GET` | `/api/category` | Daftar kategori |
+| `GET` | `/api/category/:id` | Detail kategori |
+| `GET` | `/api/category/:id/products` | Product dalam kategori |
+| `PATCH` | `/api/category/:id` | Memperbarui kategori |
+| `DELETE` | `/api/category/:id` | Menghapus kategori |
 
 ## Relasi Product
 
@@ -116,7 +122,7 @@ Product.
 Membuat produk:
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/products \
+curl -X POST http://localhost:8080/api/product \
   -H "Content-Type: application/json" \
   -d '{
     "category_id": 1,
@@ -170,7 +176,7 @@ curl -X POST http://localhost:8080/api/v1/products \
 Memperbarui sebagian field produk:
 
 ```bash
-curl -X PATCH http://localhost:8080/api/v1/products/1 \
+curl -X PATCH http://localhost:8080/api/product/1 \
   -H "Content-Type: application/json" \
   -d '{
     "price": 700000,

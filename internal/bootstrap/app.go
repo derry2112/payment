@@ -1,13 +1,13 @@
 package bootstrap
 
 import (
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
 	"payment/internal/handler"
 	"payment/internal/repository"
 	"payment/internal/route"
 	"payment/internal/service"
-
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type App struct {
@@ -19,8 +19,13 @@ func NewApp(db *gorm.DB) *App {
 	productService := service.NewProductService(productRepository)
 	productHandler := handler.NewProductHandler(productService)
 
+	categoryRepository := repository.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepository)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+
 	router := route.New(route.Dependencies{
-		ProductHandler: productHandler,
+		ProductHandler:  productHandler,
+		CategoryHandler: categoryHandler,
 	})
 
 	return &App{
