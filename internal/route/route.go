@@ -8,7 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(productHandler *handler.ProductHandler) *gin.Engine {
+type Dependencies struct {
+	ProductHandler *handler.ProductHandler
+}
+
+func New(dependencies Dependencies) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
@@ -19,16 +23,7 @@ func New(productHandler *handler.ProductHandler) *gin.Engine {
 	})
 
 	api := router.Group("/api/v1")
-	{
-		products := api.Group("/products")
-		{
-			products.POST("", productHandler.Create)
-			products.GET("", productHandler.FindAll)
-			products.GET("/:id", productHandler.FindByID)
-			products.PATCH("/:id", productHandler.Update)
-			products.DELETE("/:id", productHandler.Delete)
-		}
-	}
+	registerProductRoutes(api, dependencies.ProductHandler)
 
 	return router
 }

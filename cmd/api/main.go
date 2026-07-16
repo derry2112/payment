@@ -9,13 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"payment/internal/database"
-	"payment/internal/handler"
-	"payment/internal/repository"
-	"payment/internal/route"
-	"payment/internal/service"
-
 	"github.com/joho/godotenv"
+
+	"payment/internal/bootstrap"
+	"payment/internal/database"
 )
 
 func main() {
@@ -34,15 +31,11 @@ func main() {
 		log.Fatalf("gagal menjalankan auto migration: %v", err)
 	}
 
-	productRepository := repository.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
-	productHandler := handler.NewProductHandler(productService)
-
-	router := route.New(productHandler)
+	app := bootstrap.NewApp(db)
 	port := getEnv("APP_PORT", "8080")
 	server := &http.Server{
 		Addr:              ":" + port,
-		Handler:           router,
+		Handler:           app.Router,
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,

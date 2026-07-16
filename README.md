@@ -68,6 +68,7 @@ Dalam mode tersebut, logger tetap mencatat query lambat dan error database.
 │   └── api
 │       └── main.go    # entry point REST API
 ├── internal
+│   ├── bootstrap      # dependency wiring dan application setup
 │   ├── database       # koneksi dan auto migration
 │   ├── dto            # request, response, dan pagination reusable
 │   ├── handler        # validasi input dan HTTP response
