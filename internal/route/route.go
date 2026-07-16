@@ -1,8 +1,6 @@
 package route
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	"payment/internal/handler"
@@ -11,17 +9,14 @@ import (
 type Dependencies struct {
 	ProductHandler  *handler.ProductHandler
 	CategoryHandler *handler.CategoryHandler
+	HealthHandler   *handler.HealthHandler
 }
 
 func New(dependencies Dependencies) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-		})
-	})
+	registerHealthRoutes(router, dependencies.HealthHandler)
 
 	api := router.Group("/api")
 	registerProductRoutes(api, dependencies.ProductHandler)

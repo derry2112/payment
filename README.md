@@ -25,6 +25,10 @@ DB_NAME=payment
 DB_SSLMODE=disable
 DB_TIMEZONE=Asia/Singapore
 DB_DEBUG=true
+DB_MAX_OPEN_CONNS=25
+DB_MAX_IDLE_CONNS=10
+DB_CONN_MAX_LIFETIME=30m
+DB_CONN_MAX_IDLE_TIME=5m
 ```
 
 Nilai tersebut juga tersedia di `.env.example`. Salin menjadi `.env`, lalu
@@ -34,10 +38,28 @@ Contoh:
 
 ```bash
 cp .env.example .env
+go run ./cmd/migrate
 go run ./cmd/api
 ```
 
 Jika environment tidak diisi, aplikasi memakai nilai default di atas.
+
+## Menjalankan migration
+
+Migration dipisahkan dari startup API agar beberapa replica API tidak menjalankan
+perubahan schema secara bersamaan.
+
+Jalankan migration sebelum menjalankan atau mendeploy API:
+
+```bash
+go run ./cmd/migrate
+```
+
+Setelah migration berhasil:
+
+```bash
+go run ./cmd/api
+```
 
 ## Log query global
 
@@ -60,16 +82,31 @@ DB_DEBUG=false
 
 Dalam mode tersebut, logger tetap mencatat query lambat dan error database.
 
+## Database connection pool
+
+Connection pool PostgreSQL dapat diatur melalui:
+
+```env
+DB_MAX_OPEN_CONNS=25
+DB_MAX_IDLE_CONNS=10
+DB_CONN_MAX_LIFETIME=30m
+DB_CONN_MAX_IDLE_TIME=5m
+```
+
+Nilai durasi mengikuti format Go seperti `30s`, `5m`, atau `1h`.
+
 ## Struktur project
 
 ```text
 .
 ├── cmd
-│   └── api
-│       └── main.go    # entry point REST API
+│   ├── api
+│   │   └── main.go    # entry point REST API
+│   └── migrate
+│       └── main.go    # command migration database
 ├── internal
 │   ├── bootstrap      # dependency wiring dan application setup
-│   ├── database       # koneksi dan auto migration
+│   ├── database       # koneksi dan migration
 │   ├── dto            # request, response, dan pagination reusable
 │   ├── handler        # validasi input dan HTTP response
 │   ├── mapper         # konversi model ke DTO
@@ -90,7 +127,9 @@ Client -> Route -> Handler -> Service -> Repository -> PostgreSQL
 
 | Method | Endpoint | Keterangan |
 |---|---|---|
-| `GET` | `/health` | Health check |
+| `GET` | `/health` | Health check (kompatibilitas) |
+| `GET` | `/health/live` | Liveness check proses API |
+| `GET` | `/health/ready` | Readiness check API dan PostgreSQL |
 | `POST` | `/api/product` | Membuat produk |
 | `GET` | `/api/product?page=1&limit=10` | Daftar produk |
 | `GET` | `/api/product/:id` | Detail produk |

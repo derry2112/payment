@@ -23,9 +23,12 @@ func NewApp(db *gorm.DB) *App {
 	categoryService := service.NewCategoryService(categoryRepository)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
+	healthHandler := handler.NewHealthHandler(db)
+
 	router := route.New(route.Dependencies{
 		ProductHandler:  productHandler,
 		CategoryHandler: categoryHandler,
+		HealthHandler:   healthHandler,
 	})
 
 	return &App{

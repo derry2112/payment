@@ -26,10 +26,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("gagal terhubung ke database: %v", err)
 	}
-
-	if err := database.Migrate(db); err != nil {
-		log.Fatalf("gagal menjalankan auto migration: %v", err)
-	}
+	defer func() {
+		if err := database.Close(db); err != nil {
+			log.Printf("gagal menutup koneksi database: %v", err)
+		}
+	}()
 
 	app := bootstrap.NewApp(db)
 	port := getEnv("APP_PORT", "8080")
